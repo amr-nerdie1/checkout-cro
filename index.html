@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout Revamp Prototype</title>
+<meta name="description" content="Clickable prototype of a building-materials checkout revamp: one-click samples, guest-first check-in, address autocomplete and review, customer-chosen delivery dates.">
+<style>
+:root{--navy:#0B1F3A;--teal:#0E8C8C;--teal2:#14B8A6;--tealsoft:#E6F4F3;--ink:#16202E;--muted:#5A6778;--line:#E3E8EF;--bg:#F7F9FB;--amber:#B45309;--ambersoft:#FEF3C7;--red:#B42318;--redsoft:#FEE4E2}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+button{font:inherit;cursor:pointer}
+.top{background:var(--navy);color:#fff;padding:12px 16px}
+.top .w{max-width:980px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:.3px}.brand span{color:var(--teal2)}
+.toggle{display:flex;background:#13294B;border-radius:999px;padding:3px}
+.toggle button{border:0;background:transparent;color:#C9D5E4;padding:7px 14px;border-radius:999px;font-size:14px;font-weight:600}
+.toggle button[aria-pressed=true]{background:#fff;color:var(--navy)}
+.w{max-width:980px;margin:0 auto;padding:0 16px}
+.intro{padding:18px 0 6px;color:var(--muted);font-size:14px}
+.hud{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
+.chip{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px}
+.chip b{font-size:16px;color:var(--navy);margin-right:4px}
+.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;padding-bottom:40px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
+h2{font-size:18px;margin:0 0 12px;color:var(--navy)}
+.item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.sw{width:56px;height:56px;border-radius:8px;flex:none}
+.item .t{flex:1}.item .t b{display:block}.item .t small{color:var(--muted)}
+.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:700}
+.btn.p{background:var(--teal);color:#fff}.btn.p:disabled{background:#9AA5B1}
+.btn.g{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn.s{background:var(--tealsoft);color:#0B5E5E;padding:8px 12px;font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+input{width:100%;padding:11px 12px;border:1px solid #CBD2D9;border-radius:10px;font:inherit}
+input:focus{outline:2px solid var(--teal2);border-color:var(--teal2)}
+.steps{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.steps span{font-size:12px;padding:4px 10px;border-radius:999px;background:#EEF2F7;color:var(--muted)}
+.steps span.on{background:var(--navy);color:#fff}
+.sugg{border:1px solid var(--line);border-radius:10px;margin-top:4px;overflow:hidden;background:#fff}
+.sugg button{display:block;width:100%;text-align:left;border:0;background:#fff;padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px}
+.sugg button:hover,.sugg button:focus{background:var(--tealsoft)}
+.dates{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+.dates button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 4px;font-size:13px}
+.dates button[aria-pressed=true]{border-color:var(--teal);background:var(--tealsoft);font-weight:700}
+.note{font-size:13px;color:var(--muted);margin-top:8px}
+.warn{background:var(--ambersoft);color:var(--amber);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+.bad{background:var(--redsoft);color:var(--red);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+.ok{background:var(--tealsoft);color:#0B5E5E;border-radius:10px;padding:12px;font-size:15px}
+.sum .r{display:flex;justify-content:space-between;padding:6px 0;font-size:15px}
+.sum .r.tot{border-top:1px solid var(--line);margin-top:6px;padding-top:10px;font-weight:800}
+.why{font-size:13px;color:var(--muted)}
+.why li{margin:6px 0}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
+dialog{border:0;border-radius:16px;padding:0;max-width:440px;width:calc(100% - 32px)}
+dialog::backdrop{background:rgba(11,31,58,.55)}
+.dh{padding:18px 20px 0}.dh h3{margin:0;color:var(--navy)}
+.db{padding:10px 20px 20px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #CBD2D9;border-top-color:var(--teal);border-radius:50%;animation:s 1s linear infinite;vertical-align:-3px;margin-right:6px}
+@keyframes s{to{transform:rotate(360deg)}}
+.pay{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pay button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:12px 6px;font-size:14px}
+.pay button[aria-pressed=true]{border-color:var(--teal);background:var(--tealsoft);font-weight:700}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:10px 16px 30px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.dates{grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){.spin{animation:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="w">
+  <div class="brand">Plank<span>house</span> <small style="font-weight:500;opacity:.7">· fictional store, prototype</small></div>
+  <div class="toggle" role="group" aria-label="Checkout version">
+    <button id="vOld" aria-pressed="false">Before</button>
+    <button id="vNew" aria-pressed="true">After (revamp)</button>
+  </div>
+</div></div>
+
+<div class="w">
+  <p class="intro">A clickable reconstruction of a checkout revamp for an online building-materials store. Switch between <b>Before</b> and <b>After</b> and try both paths: order a free sample, then check out the flooring. Try a returning email such as <code>pro@example.com</code>, or any new email. Nothing is charged or stored.</p>
+  <div class="hud" aria-live="polite">
+    <div class="chip"><b id="hClicks">0</b>clicks</div>
+    <div class="chip"><b id="hTime">0.0s</b>elapsed</div>
+    <div class="chip"><b id="hFields">0</b>fields typed</div>
+    <div class="chip" id="hMode">Mode: After</div>
+  </div>
+  <div class="grid">
+    <div class="card" id="main"></div>
+    <div>
+      <div class="card sum" id="sum"></div>
+      <div class="card" style="margin-top:18px"><span class="tag">Why this design</span><ul class="why" id="why"></ul></div>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlg"><div class="dh"><h3 id="dT"></h3></div><div class="db" id="dB"></div></dialog>
+<footer>Portfolio prototype by Amrisha Rajkhowa. Fictional brand and products; no data is collected.</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const PRODUCTS=[
+ {id:"oak",name:"Engineered oak, 7 in natural",price:4.29,unit:"sq ft",qty:620,color:"#C69C6D"},
+ {id:"lvp",name:"Vinyl plank, 12 mil coastal grey",price:2.49,unit:"sq ft",qty:0,color:"#9AA3AB"}];
+const KNOWN={"pro@example.com":{name:"Dana",addr:"1180 Harbour St, Vancouver, BC V6B 2K5"}};
+const ADDR=["1180 Harbour St, Vancouver, BC V6B 2K5","118 Harbourview Rd, North Vancouver, BC V7G 1B4","1185 Harwood St, Vancouver, BC V6E 1S3",
+ "22 Maple Ridge Cres, Maple Ridge, BC V2X 3L9","2240 Main St, Vancouver, BC V5T 3C7","224 Main St W, North Bay, ON P1B 2T6",
+ "4521 Cedar Ave, Burnaby, BC V5G 2Y1","452 Cedar Lane, Kelowna, BC V1Y 7R3","9 Willow Way, Surrey, BC V3S 8A2"];
+const WHY={
+ new:["<b>One-click samples:</b> samples predict orders, so the path to one is the shortest in the store. No live shipping-rate call is needed for a flat-rate sample.",
+      "<b>Guest-first:</b> a new email continues as a guest; the account is offered after the order, not before.",
+      "<b>Address autocomplete + review:</b> freight can't be redirected cheaply once it ships, so the address is confirmed before payment.",
+      "<b>Customer-chosen delivery date:</b> LTL freight needs someone home. The customer picks from real windows.",
+      "<b>Payment choice:</b> card, PayPal or financing for high-ticket orders (demo: nothing is charged)."],
+ old:["Samples go through the full freight checkout, including a live shipping-rate call.",
+      "Account creation is required before checkout.",
+      "No address autocomplete and no confirmation step: typos ship.",
+      "Delivery date is assigned, not chosen.",
+      "This is the baseline the revamp was measured against."]};
+let mode="new", st, timer, clicks=0, fields=0, t0=null;
+function tick(){ if(t0) $("#hTime").textContent=((performance.now()-t0)/1000).toFixed(1)+"s"; }
+function bump(){ clicks++; $("#hClicks").textContent=clicks; if(!t0){t0=performance.now(); timer=setInterval(tick,100);} }
+document.addEventListener("click",e=>{ if(e.target.closest("button")) bump(); });
+document.addEventListener("change",e=>{ if(e.target.matches("input")) {fields++; $("#hFields").textContent=fields;} });
+function reset(){ clicks=0;fields=0;t0=null;clearInterval(timer);["#hClicks","#hFields"].forEach(s=>$(s).textContent="0");$("#hTime").textContent="0.0s";
+ st={step:"cart",path:null,email:"",guest:false,addr:"",date:null,pay:null,known:null}; render(); }
+function setMode(m){ mode=m; $("#vOld").setAttribute("aria-pressed",m==="old"); $("#vNew").setAttribute("aria-pressed",m==="new");
+ $("#hMode").textContent="Mode: "+(m==="new"?"After":"Before"); $("#why").innerHTML=WHY[m].map(x=>`<li>${x}</li>`).join(""); reset(); }
+$("#vOld").onclick=()=>setMode("old"); $("#vNew").onclick=()=>setMode("new");
+
+function money(x){return "$"+x.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
+function sample(){ return st.path==="sample"; }
+function totals(){ if(sample()) return {sub:0,ship:0,tot:0};
+ const sub=PRODUCTS.reduce((a,p)=>a+p.price*p.qty,0), ship=149; return {sub,ship,tot:sub+ship}; }
+function renderSum(){ const t=totals();
+ $("#sum").innerHTML=`<h2>Order summary</h2>`+(sample()?`<div class="r"><span>Free sample: ${st.sampleName}</span><span>$0.00</span></div><div class="r"><span>Shipping</span><span>Free</span></div>`:
+ PRODUCTS.filter(p=>p.qty).map(p=>`<div class="r"><span>${p.name}<br><small style="color:var(--muted)">${p.qty} ${p.unit} × ${money(p.price)}</small></span><span>${money(p.price*p.qty)}</span></div>`).join("")+
+ `<div class="r"><span>Freight (LTL)</span><span>${st.step==="cart"?"at checkout":money(t.ship)}</span></div>`)+`<div class="r tot"><span>Total</span><span>${money(t.tot)}</span></div>`; }
+
+const STEPS_NEW=["Email","Address","Delivery","Payment"], STEPS_OLD=["Create account","Address","Shipping","Payment"];
+function stepper(i){ const L=mode==="new"?STEPS_NEW:STEPS_OLD; return `<div class="steps">${L.map((s,k)=>`<span class="${k===i?"on":""}">${k+1}. ${s}</span>`).join("")}</div>`; }
+
+function render(){ renderSum(); const m=$("#main");
+ if(st.step==="cart"){
+  m.innerHTML=`<h2>Your cart</h2>`+PRODUCTS.map(p=>`<div class="item"><div class="sw" style="background:${p.color}"></div><div class="t"><b>${p.name}</b><small>${p.qty?p.qty+" "+p.unit+" · "+money(p.price)+"/"+p.unit:"Not in cart"}</small></div>
+   <button class="btn s" data-sample="${p.id}">${mode==="new"?"Free sample: 1 click":"Order free sample"}</button></div>`).join("")+
+   `<div class="row" style="margin-top:14px"><button class="btn p" id="go">Checkout flooring</button></div><p class="note">Tip: try a sample first, then the flooring checkout, in both modes.</p>`;
+  m.querySelectorAll("[data-sample]").forEach(b=>b.onclick=()=>startSample(b.dataset.sample));
+  $("#go").onclick=()=>{st.path="order";st.step="email";render();};
+  return;
+ }
+ if(st.step==="email") return mode==="new"?emailNew(m):accountOld(m);
+ if(st.step==="address") return address(m);
+ if(st.step==="delivery") return delivery(m);
+ if(st.step==="payment") return payment(m);
+ if(st.step==="done") return done(m);
+}
+
+// ---------------- sample path
+function startSample(id){ const p=PRODUCTS.find(x=>x.id===id); st.path="sample"; st.sampleName=p.name;
+ if(mode==="new"){
+   const known=Object.values(KNOWN)[0];
+   $("#main").innerHTML=`<h2>Free sample</h2><p>Ship a sample of <b>${p.name}</b> to:</p><div class="ok">${known.addr}<br><small>Saved address for pro@example.com</small></div>
+   <div class="row" style="margin-top:12px"><button class="btn p" id="one">Send my sample</button><button class="btn g" id="other">Use a different address</button></div>
+   <p class="note">Flat-rate sample: no live freight-rate lookup needed.</p>`;
+   renderSum();
+   $("#one").onclick=()=>{st.addr=known.addr;st.step="done";render();};
+   $("#other").onclick=()=>{st.step="address";render();};
+ } else { st.step="email"; render(); }
+}
+
+// ---------------- AFTER: guest-first email
+function emailNew(m){
+ m.innerHTML=stepper(0)+`<h2>Start with your email</h2><label for="em">Email</label><input id="em" type="email" placeholder="you@example.com" autocomplete="email">
+ <div class="row" style="margin-top:14px"><button class="btn p" id="cont">Continue</button></div><p class="note">No account needed to check out.</p>`;
+ $("#cont").onclick=()=>{ const v=$("#em").value.trim().toLowerCase(); if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ $("#em").focus(); return; }
+  st.email=v; st.known=KNOWN[v]||null;
+  if(st.known){ st.addr=st.known.addr; st.step="address"; render(); return; }
+  modal("New here? No problem.",`<p><b>${esc(v)}</b> isn't linked to an account yet.</p><p>Check out as a guest now. You can turn this order into an account in one click at the end.</p>
+   <div class="row"><button class="btn p" id="mOk">Continue as guest</button><button class="btn g" id="mFix">Edit email</button></div>`,
+   ()=>{ $("#mOk").onclick=()=>{st.guest=true;closeM();st.step="address";render();}; $("#mFix").onclick=()=>{closeM();$("#em").focus();}; });
+ };
+}
+// ---------------- BEFORE: account wall
+function accountOld(m){
+ m.innerHTML=stepper(0)+`<h2>Create an account to continue</h2><label>First name</label><input><label>Last name</label><input><label>Email</label><input type="email"><label>Phone</label><input>
+ <label>Confirm email</label><input type="email"><div class="row" style="margin-top:14px"><button class="btn p" id="cont">Create account &amp; continue</button></div>
+ <p class="note">Before: every buyer, including someone ordering a free sample, had to register first.</p>`;
+ $("#cont").onclick=()=>{ const filled=[...m.querySelectorAll("input")].every(i=>i.value.trim()); if(!filled){ m.insertAdjacentHTML("beforeend",`<div class="bad">Please complete all fields.</div>`); return; } st.step="address"; render(); };
+}
+
+// ---------------- address
+function address(m){
+ const i=sample()?1:1;
+ if(mode==="new"){
+  m.innerHTML=stepper(i)+`<h2>Delivery address</h2>${st.known?`<div class="ok">Welcome back, ${st.known.name}. Using your saved address.</div>`:""}
+  <label for="ad">Start typing your address</label><input id="ad" autocomplete="off" value="${esc(st.addr)}" placeholder="e.g. 1180 Harbour">
+  <div id="sg"></div><p class="note">Autocomplete (in production: Google Places). Try “118”, “224” or “Cedar”.</p>
+  <div class="row" style="margin-top:14px"><button class="btn p" id="cont">Continue</button></div>`;
+  const ad=$("#ad"), sg=$("#sg");
+  ad.oninput=()=>{ const q=ad.value.trim().toLowerCase(); if(q.length<2){sg.innerHTML="";return;}
+   const hits=ADDR.filter(a=>a.toLowerCase().includes(q)).slice(0,5);
+   sg.innerHTML=hits.length?`<div class="sugg">${hits.map(h=>`<button type="button">${h}</button>`).join("")}</div>`:"";
+   sg.querySelectorAll("button").forEach(b=>b.onclick=()=>{ad.value=b.textContent;sg.innerHTML="";}); };
+  $("#cont").onclick=()=>{ const v=ad.value.trim(); if(v.length<8){ad.focus();return;} st.addr=v;
+   modal("Is this where your order should go?",`<div class="ok" style="margin-bottom:10px">${esc(v)}</div>
+    <p class="note" style="margin-top:0">Freight shipments can't be redirected cheaply once they leave the warehouse.</p>
+    ${ADDR.includes(v)?"":`<div class="warn">We couldn't verify this address. Please check the unit number and postal code.</div>`}
+    <div class="row" style="margin-top:12px"><button class="btn p" id="mOk">Yes, ship here</button><button class="btn g" id="mFix">Edit address</button></div>`,
+    ()=>{ $("#mOk").onclick=()=>{closeM(); st.step=sample()?"done":"delivery"; render();}; $("#mFix").onclick=()=>{closeM();ad.focus();}; }); };
+ } else {
+  m.innerHTML=stepper(1)+`<h2>Shipping address</h2><label>Street</label><input><label>City</label><input><label>Province</label><input><label>Postal code</label><input>
+  <div class="row" style="margin-top:14px"><button class="btn p" id="cont">Continue</button></div><p class="note">Before: no autocomplete and no confirmation step.</p>`;
+  $("#cont").onclick=()=>{ const v=[...m.querySelectorAll("input")].map(x=>x.value.trim()); if(v.some(x=>!x)){ m.insertAdjacentHTML("beforeend",`<div class="bad">Please complete all fields.</div>`); return; }
+   st.addr=v.join(", "); st.step="delivery"; render(); };
+ }
+}
+
+// ---------------- delivery
+function windows(){ const out=[]; let d=new Date(); d.setHours(0,0,0,0); let added=0; while(added<4){ d.setDate(d.getDate()+1); if(d.getDay()%6) added++; }
+ while(out.length<10){ if(d.getDay()%6) out.push(new Date(d)); d.setDate(d.getDate()+1);} return out; }
+function delivery(m){
+ if(mode==="old"){
+  m.innerHTML=stepper(2)+`<h2>Calculating shipping…</h2><p><span class="spin"></span>Contacting freight carriers for live rates</p>`;
+  setTimeout(()=>{ const d=windows()[2];
+   m.innerHTML=stepper(2)+`<h2>Shipping</h2><div class="ok">${sample()?"Sample shipping: $0.00":"LTL freight: "+money(149)}<br>Estimated delivery: <b>${d.toDateString()}</b></div>
+   <p class="note">Before: the date was assigned. Samples waited on the same live rate call.</p><div class="row" style="margin-top:14px"><button class="btn p" id="cont">Continue to payment</button></div>`;
+   $("#cont").onclick=()=>{ st.date=d; st.step="payment"; render(); }; },2600);
+  return;
+ }
+ const ws=windows();
+ m.innerHTML=stepper(2)+`<h2>Choose your delivery day</h2><p class="note" style="margin-top:0">LTL freight needs someone home to receive it. Pick a day that works.</p>
+ <div class="dates">${ws.map((d,k)=>`<button data-k="${k}" aria-pressed="${st.date&&+st.date===+d}">${d.toLocaleDateString(undefined,{weekday:"short"})}<br><b>${d.toLocaleDateString(undefined,{month:"short",day:"numeric"})}</b></button>`).join("")}</div>
+ <div class="row" style="margin-top:14px"><button class="btn p" id="cont" ${st.date?"":"disabled"}>Continue to payment</button></div>`;
+ m.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{st.date=ws[+b.dataset.k];delivery(m);});
+ $("#cont").onclick=()=>{st.step="payment";render();};
+}
+
+// ---------------- payment (demo, no fields)
+function payment(m){
+ const t=totals();
+ m.innerHTML=stepper(3)+`<h2>Payment</h2><div class="pay">${["Card","PayPal","Financing"].map(p=>`<button data-p="${p}" aria-pressed="${st.pay===p}">${p}</button>`).join("")}</div>
+ <p class="note">Demo only: no payment details are requested and nothing is charged.</p>
+ <div class="row" style="margin-top:14px"><button class="btn p" id="place" ${st.pay||t.tot===0?"":"disabled"}>Place order · ${money(t.tot)}</button></div>`;
+ m.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{st.pay=b.dataset.p;payment(m);});
+ $("#place").onclick=()=>{st.step="done";render();};
+}
+
+// ---------------- done
+function done(m){
+ clearInterval(timer); tick();
+ const secs=$("#hTime").textContent;
+ m.innerHTML=`<h2>${sample()?"Sample on its way":"Order placed"}</h2><div class="ok">${sample()?st.sampleName:"Flooring order"} → ${esc(st.addr||"")}${st.date?`<br>Delivery: <b>${st.date.toDateString()}</b>`:""}</div>
+ <p style="margin-top:14px"><b>${clicks}</b> clicks · <b>${fields}</b> fields typed · <b>${secs}</b></p>
+ ${mode==="new"&&st.guest?`<div class="card" style="margin-top:10px;background:var(--bg)"><b>Save this order to an account?</b><p class="note" style="margin-top:4px">We'll email ${esc(st.email)} a link to finish setup. Your order is already placed either way.</p><button class="btn s" id="act">Activate my account</button></div>`:""}
+ <div class="row" style="margin-top:14px"><button class="btn g" id="again">Start over</button><button class="btn g" id="sw">Try the ${mode==="new"?"Before":"After"} version</button></div>`;
+ const a=$("#act"); if(a) a.onclick=()=>{a.outerHTML=`<div class="ok">Activation link sent (demo).</div>`;};
+ $("#again").onclick=reset; $("#sw").onclick=()=>setMode(mode==="new"?"old":"new");
+}
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function modal(t,html,bind){ $("#dT").textContent=t; $("#dB").innerHTML=html; $("#dlg").showModal(); bind(); }
+function closeM(){ $("#dlg").close(); }
+setMode("new");
+</script>
+</body>
+</html>
